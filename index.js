@@ -9,15 +9,17 @@ app.get("/", function (req, res) {
   res.sendFile(__dirname + '/views/index.html');
 });
 
-app.get("/api/:date?", function(req, res) {
-  let input = req.params.date;
+function parseDate(input) {
+  return /^\d+$/.test(input) ? new Date(parseInt(input)) : new Date(input);
+}
 
-  if (!input) {
-    let now = new Date();
-    return res.json({ unix: now.getTime(), utc: now.toUTCString() });
-  }
+app.get("/api", function(req, res) {
+  let now = new Date();
+  res.json({ unix: now.getTime(), utc: now.toUTCString() });
+});
 
-  let date = /^\d+$/.test(input) ? new Date(parseInt(input)) : new Date(input);
+app.get("/api/:date", function(req, res) {
+  let date = parseDate(req.params.date);
 
   if (isNaN(date.getTime())) {
     return res.json({ error: "Invalid Date" });
